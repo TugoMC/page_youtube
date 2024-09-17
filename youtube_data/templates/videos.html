@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vidéos YouTube de la chaîne</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+          "Helvetica Neue", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: rgb(22, 20, 24);
+        color: #eee;
+        user-select: none;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #ee83e5;
+      }
+
+      .form-container {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      input[type="text"] {
+        padding: 0.5rem;
+        width: 300px;
+        background-color: #282c34;
+        border: 1px solid #ffffff22;
+        color: #eee;
+        border-radius: 0.3rem;
+      }
+
+      input[type="submit"] {
+        padding: 0.5rem 1rem;
+        background-color: #ee83e5;
+        color: #282c34;
+        border: none;
+        border-radius: 0.3rem;
+        cursor: pointer;
+      }
+
+      .video-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+      }
+
+      .video-item {
+        max-width: 300px;
+        border: 1px solid #ffffff22;
+        background-color: #282c34;
+        background: linear-gradient(
+          0deg,
+          rgba(40, 44, 52, 1) 0%,
+          rgba(17, 0, 32, 0.5) 100%
+        );
+        box-shadow: 0 7px 20px 5px #00000088;
+        border-radius: 0.7rem;
+        backdrop-filter: blur(7px);
+        -webkit-backdrop-filter: blur(7px);
+        overflow: hidden;
+        transition: 0.5s all;
+      }
+
+      .video-item:hover {
+        border: 1px solid #ffffff44;
+        box-shadow: 0 7px 50px 10px #000000aa;
+        transform: scale(1.015);
+        filter: brightness(1.3);
+      }
+
+      .video-link {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .video-info {
+        padding: 1rem;
+      }
+
+      .video-title {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: #ee83e5;
+      }
+
+      .video-description {
+        color: #a89ec9;
+        margin-bottom: 0.5rem;
+      }
+
+      .video-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+
+      .pagination a {
+        padding: 0.5rem 1rem;
+        margin: 0 0.5rem;
+        background-color: #ee83e5;
+        color: #282c34;
+        text-decoration: none;
+        border-radius: 0.3rem;
+        transition: background-color 0.3s;
+      }
+
+      .pagination a:hover {
+        background-color: #d665cd;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Vidéos YouTube de la chaîne</h1>
+
+    <div class="form-container">
+      <form method="GET" action="">
+        <input
+          type="text"
+          name="channel_url"
+          placeholder="Entrez l'URL de la chaîne YouTube"
+          value="{{ channel_url }}"
+          required
+        />
+        <input type="submit" value="Rechercher" />
+      </form>
+    </div>
+
+    <div class="video-container">
+      {% for video in videos %}
+      <div class="video-item">
+        <a href="{% url 'video_detail' video.id.videoId %}" class="video-link">
+          <img
+            src="{{ video.snippet.thumbnails.medium.url }}"
+            alt="{{ video.snippet.title }}"
+          />
+          <div class="video-info">
+            <div class="video-title">{{ video.snippet.title }}</div>
+            <div class="video-description">
+              {{ video.snippet.description|truncatechars:100 }}
+            </div>
+            <p>Publié le : {{ video.snippet.publishedAt|date:"d/m/Y" }}</p>
+            <p>Vues : {{ video.statistics.viewCount }}</p>
+          </div>
+        </a>
+      </div>
+      {% empty %}
+      <p>Aucune vidéo trouvée pour cette chaîne.</p>
+      {% endfor %}
+    </div>
+
+    <div class="pagination">
+      {% if prev_page_token %}
+      <a
+        href="?channel_url={{ channel_url }}&page_token={{ prev_page_token }}&page=1"
+        >Première page</a
+      >
+      <a
+        href="?channel_url={{ channel_url }}&page_token={{ prev_page_token }}&page={{ current_page|add:'-1' }}"
+        >Page précédente</a
+      >
+      {% endif %} {% for page_num in page_range %}
+      <a
+        href="?channel_url={{ channel_url }}&page={{ page_num }}"
+        class="{% if page_num == current_page %}active{% endif %}"
+      >
+        {{ page_num }}
+      </a>
+      {% endfor %} {% if next_page_token %}
+      <a
+        href="?channel_url={{ channel_url }}&page_token={{ next_page_token }}&page={{ current_page|add:'1' }}"
+        >Page suivante</a
+      >
+      <a
+        href="?channel_url={{ channel_url }}&page_token={{ next_page_token }}&page={{ total_pages }}"
+        >Dernière page</a
+      >
+      {% endif %}
+    </div>
+  </body>
+</html>
