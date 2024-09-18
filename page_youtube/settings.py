@@ -126,3 +126,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 YOUTUBE_API_KEY = 'AIzaSyDWYAowkqPU9nvB9NlGjwjpIKttxfzT1Zg'
+
+ALLOWED_HOSTS = ['*']
